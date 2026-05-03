@@ -10,6 +10,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using ToDo.Application.DTOs.Account;
 using ToDo.Application.DTOs.Authentication;
+using ToDo.Application.Enums;
 using ToDo.Application.Interfaces.Identity;
 using ToDo.Infrastructure.Data.Identity.Entities;
 
@@ -75,6 +76,12 @@ namespace ToDo.Infrastructure.Data.Identity.Services
             {
                 loginResult.Succeeded = false;
 
+                loginResult.Error = new LoginErrorDTO
+                {
+                    Code = LoginErrorTypes.InvalidLoginAttempt,
+                    Description = "Invalid login attempt"
+                };
+
                 return loginResult;
             }
 
@@ -84,23 +91,8 @@ namespace ToDo.Infrastructure.Data.Identity.Services
             {
                 loginResult.Error = new LoginErrorDTO
                 {
-                    Code = "Unauthorized",
-                    Description = "Email or password is incorrect"
-                };
-
-                return loginResult;
-            }
-
-            var isEmailConfirmed = await _userManager.IsEmailConfirmedAsync(user);
-
-            if (!isEmailConfirmed)
-            {
-                loginResult.Succeeded = false;
-
-                loginResult.Error = new LoginErrorDTO
-                {
-                    Code = "Email",
-                    Description = "Email is not confirmed"
+                    Code = LoginErrorTypes.InvalidLoginAttempt,
+                    Description = "Invalid login attempt"
                 };
 
                 return loginResult;
@@ -117,6 +109,21 @@ namespace ToDo.Infrastructure.Data.Identity.Services
                 LastName = user.LastName,
                 Bio = user.Bio,
             };
+
+            var isEmailConfirmed = await _userManager.IsEmailConfirmedAsync(user);
+
+            if (!isEmailConfirmed)
+            {
+                loginResult.Succeeded = false;
+
+                loginResult.Error = new LoginErrorDTO
+                {
+                    Code = LoginErrorTypes.EmailNotConfirmed,
+                    Description = "Email is not confirmed"
+                };
+
+                return loginResult;
+            }
 
             return loginResult;
         }
@@ -149,6 +156,32 @@ namespace ToDo.Infrastructure.Data.Identity.Services
             var securityToken = tokenHandler.CreateToken(tokenDescriptor);
 
             return tokenHandler.WriteToken(securityToken);
+        }
+
+        public async Task<string> GenerateEmailConfirmationTokenAsync(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+
+            if (user == null)
+            {
+                return string.Empty;
+            }
+
+            return await _userManager.GenerateEmailConfirmationTokenAsync(user);
+        }
+
+        public async Task<bool> ConfirmEmailAsync(string email, string token)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+
+            if (user == null)
+            {
+                return false;
+            }
+
+            var result = await _userManager.ConfirmEmailAsync(user, token);
+
+            return result.Succeeded;
         }
     }
 }

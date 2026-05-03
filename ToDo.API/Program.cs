@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Infrastructure;
 using ToDo.Infrastructure.IoC;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -35,6 +36,9 @@ builder.Services.Configure<ApiBehaviorOptions>(options =>
         return new BadRequestObjectResult(new { errors });
     };
 });
+
+builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddInfrastructure(builder.Configuration);
 

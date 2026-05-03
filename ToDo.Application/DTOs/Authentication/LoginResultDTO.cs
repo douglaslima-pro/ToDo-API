@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using ToDo.Application.DTOs.Account;
+using ToDo.Application.Enums;
 
 namespace ToDo.Application.DTOs.Authentication
 {
@@ -16,7 +17,7 @@ namespace ToDo.Application.DTOs.Authentication
 
     public class LoginErrorDTO
     {
-        public string Code { get; set; } = string.Empty;
+        public LoginErrorTypes Code { get; set; }
         public string Description { get; set; } = string.Empty;
     }
 }

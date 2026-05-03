@@ -2,6 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 using ToDo.API.Models.Authentication;
 using ToDo.Application.DTOs.Authentication;
+using ToDo.Application.Enums;
+using ToDo.Application.Interfaces.Email;
 using ToDo.Application.Interfaces.Identity;
 
 namespace ToDo.API.Controllers
@@ -12,10 +14,14 @@ namespace ToDo.API.Controllers
     public class AuthenticationController : ControllerBase
     {
         private readonly IAuthenticationService _authenticationService;
+        private readonly IEmailService _emailService;
 
-        public AuthenticationController(IAuthenticationService authenticationService)
+        public AuthenticationController(
+            IAuthenticationService authenticationService,
+            IEmailService emailService)
         {
             _authenticationService = authenticationService;
+            _emailService = emailService;
         }
 
         [HttpPost("[action]")]
@@ -79,15 +85,20 @@ namespace ToDo.API.Controllers
 
             if (!loginResult.Succeeded)
             {
+                if (loginResult.Error?.Code == LoginErrorTypes.EmailNotConfirmed)
+                {
+                    var emailConfirmationToken = await _authenticationService.GenerateEmailConfirmationTokenAsync(loginRequest.Email);
+                }
+
                 return Unauthorized(new
                 {
                     loginResult.Error
                 });
             }
 
-            var token = _authenticationService.GenerateAccessTokenAsync(loginResult.User!);
+            var accessToken = _authenticationService.GenerateAccessTokenAsync(loginResult.User!);
 
-            return Ok(token);
+            return Ok(accessToken);
         }
     }
 }
