@@ -8,6 +8,10 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Content Remove="wwwroot\email\templates\EmailConfirmationTemplate.html" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.Mvc.NewtonsoftJson" Version="8.0.26" />
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" Version="10.0.7" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="8.0.26">
@@ -20,6 +24,10 @@
   <ItemGroup>
     <ProjectReference Include="..\ToDo.Application\ToDo.Application.csproj" />
     <ProjectReference Include="..\ToDo.Infrastructure\ToDo.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="wwwroot\email\templates\EmailConfirmationTemplate.html" />
   </ItemGroup>
 
 </Project>

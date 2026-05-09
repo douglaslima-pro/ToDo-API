@@ -9,10 +9,14 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
+using ToDo.Application.Interfaces.Email;
 using ToDo.Application.Interfaces.Identity;
+using ToDo.Application.Interfaces.Services;
+using ToDo.Application.Services;
 using ToDo.Infrastructure.Data.Contexts;
 using ToDo.Infrastructure.Data.Identity.Entities;
 using ToDo.Infrastructure.Data.Identity.Services;
+using ToDo.Infrastructure.Email.Services;
 
 namespace ToDo.Infrastructure.IoC
 {
@@ -67,13 +71,12 @@ namespace ToDo.Infrastructure.IoC
                     };
                 });
 
-            services.AddAuthorization(options =>
-            {
-
-            });
+            services.AddAuthorization();
 
             // Services
             services.AddScoped<IAuthenticationService, AuthenticationService>();
+            services.AddScoped<IEmailService, EmailService>();
+            services.AddScoped<ITaskService, TaskService>();
         }
     }
 }

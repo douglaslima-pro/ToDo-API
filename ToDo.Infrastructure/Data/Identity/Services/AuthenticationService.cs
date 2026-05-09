@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
+using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
 using ToDo.Application.DTOs.Account;
 using ToDo.Application.DTOs.Authentication;
@@ -133,7 +134,8 @@ namespace ToDo.Infrastructure.Data.Identity.Services
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new Claim(ClaimTypes.Name, user.UserName ?? string.Empty),
+                new Claim(ClaimTypes.Name, user.FirstName ?? string.Empty),
+                new Claim(Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames.Sub, user.UserName ?? string.Empty),
                 new Claim(ClaimTypes.Email, user.Email ?? string.Empty),
             };
 
@@ -170,18 +172,44 @@ namespace ToDo.Infrastructure.Data.Identity.Services
             return await _userManager.GenerateEmailConfirmationTokenAsync(user);
         }
 
-        public async Task<bool> ConfirmEmailAsync(string email, string token)
+        public async Task<ConfirmEmailResultDTO> ConfirmEmailAsync(string? email, string? token)
         {
+            if (string.IsNullOrEmpty(email))
+            {
+                return new ConfirmEmailResultDTO
+                {
+                    Succeeded = false,
+                    Error = "Email is required"
+                };
+            }
+
+            if (string.IsNullOrEmpty(token))
+            {
+                return new ConfirmEmailResultDTO
+                {
+                    Succeeded = false,
+                    Error = "Token is required"
+                };
+            }
+
             var user = await _userManager.FindByEmailAsync(email);
 
             if (user == null)
             {
-                return false;
+                return new ConfirmEmailResultDTO
+                {
+                    Succeeded = false,
+                    Error = "Invalid token"
+                };
             }
 
             var result = await _userManager.ConfirmEmailAsync(user, token);
 
-            return result.Succeeded;
+            return new ConfirmEmailResultDTO
+            {
+                Succeeded = result.Succeeded,
+                Error = result.Succeeded ? null : "Invalid token"
+            };
         }
     }
 }
