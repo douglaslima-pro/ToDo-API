@@ -3,6 +3,8 @@ using System.Text;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity.Data;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.WebUtilities;
+using ToDo.API.Email;
 using ToDo.API.Models.Authentication;
 using ToDo.Application.DTOs.Authentication;
 using ToDo.Application.Enums;
@@ -18,16 +20,16 @@ namespace ToDo.API.Controllers
     {
         private readonly IAuthenticationService _authenticationService;
         private readonly IEmailService _emailService;
-        private readonly IWebHostEnvironment _environment;
+        private readonly EmailTemplateReader _emailTemplateReader;
 
         public AuthenticationController(
             IAuthenticationService authenticationService,
             IEmailService emailService,
-            IWebHostEnvironment environment)
+            EmailTemplateReader emailTemplateReader)
         {
             _authenticationService = authenticationService;
             _emailService = emailService;
-            _environment = environment;
+            _emailTemplateReader = emailTemplateReader;
         }
 
         [HttpPost("[action]")]
@@ -53,20 +55,9 @@ namespace ToDo.API.Controllers
 
             if (!registerResult.Succeeded)
             {
-                var errors = registerResult.Errors.GroupBy(e =>
-                    e.Code.Contains("UserName") ? "UserName" :
-                    e.Code.Contains("Email") ? "Email" :
-                    e.Code.Contains("Password") ? "Password" :
-                    e.Code
-                )
-                    .ToDictionary(
-                        g => g.Key,
-                        g => g.Select(e => e.Description).ToList()
-                    );
-
                 return BadRequest(new
                 {
-                    errors
+                    errors = registerResult.Errors
                 });
             }
 
@@ -91,11 +82,6 @@ namespace ToDo.API.Controllers
 
             if (!loginResult.Succeeded)
             {
-                if (loginResult.Error?.Code == LoginErrorTypes.EmailNotConfirmed)
-                {                        
-                    await SendEmailConfirmationTokenAsync(loginRequest.Email, loginResult.User?.FirstName ?? string.Empty);
-                }
-
                 return Unauthorized(new
                 {
                     loginResult.Error
@@ -107,39 +93,124 @@ namespace ToDo.API.Controllers
             return Ok(accessToken);
         }
 
-        [HttpGet("email-confirmation", Name = "ConfirmEmail")]
-        public async Task<IActionResult> ConfirmEmailAsync(string? email, string? token)
+        [HttpPost("email-confirmation/send")]
+        public async Task<IActionResult> SendEmailConfirmationTokenAsync([FromBody] SendEmailConfirmationTokenModel model)
         {
-            var result = await _authenticationService.ConfirmEmailAsync(email, token);
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var token = await _authenticationService.GenerateEmailConfirmationTokenAsync(model.Email!);
+
+            var link = QueryHelpers.AddQueryString("https://site.com/email-confirmation", new Dictionary<string, string?>
+            {
+                { "email", model.Email },
+                { "token", token }
+            });
+
+            var emailTemplateValues = new Dictionary<string, object>
+            {
+                { "name", model.Name! },
+                { "link", link }
+            };
+
+            var emailTemplate = await _emailTemplateReader.ReadTemplateAsync("EmailConfirmationTemplate", emailTemplateValues);
+
+            await _emailService.SendAsync(model.Email!, "E-mail confirmation", emailTemplate);
+
+            return Ok();
+        }
+
+        [HttpPost("email-confirmation/verify", Name = "ConfirmEmail")]
+        public async Task<IActionResult> VerifyEmailConfirmationTokenAsync([FromBody] VerifyEmailConfirmationTokenModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var confirmEmailRequest = new ConfirmEmailRequestDTO
+            {
+                Email = model.Email ?? string.Empty,
+                Token = model.Token ?? string.Empty,
+            };
+
+            var result = await _authenticationService.ConfirmEmailAsync(confirmEmailRequest);
 
             return new JsonResult(result);
         }
 
-        private async Task SendEmailConfirmationTokenAsync(string email, string name)
+        [HttpPost("email-confirmation/generate-token")]
+        public async Task<IActionResult> GenerateEmailConfirmationTokenAsync([FromBody] GenerateEmailConfirmationTokenModel model)
         {
-            var token = await _authenticationService.GenerateEmailConfirmationTokenAsync(email);
-
-            var link = Url.Link("ConfirmEmail", new { email, token });
-
-            var path = Path.Combine(_environment.WebRootPath, "email", "templates", "EmailConfirmationTemplate.html");
-
-            if (!System.IO.File.Exists(path))
+            if (!ModelState.IsValid)
             {
-                return;
+                return BadRequest(ModelState);
             }
 
-            var emailTemplate = await System.IO.File.ReadAllTextAsync(path, Encoding.UTF8);
+            var token = await _authenticationService.GenerateEmailConfirmationTokenAsync(model.Email!);
 
-            if (string.IsNullOrEmpty(emailTemplate))
+            return Ok(token);
+        }
+
+        [HttpPost("password-reset/send")]
+        public async Task<IActionResult> SendPasswordResetTokenAsync([FromBody] SendPasswordResetTokenModel model)
+        {
+            if (!ModelState.IsValid)
             {
-                return;
+                return BadRequest(ModelState);
+            }
+            var token = await _authenticationService.GeneratePasswordResetTokenAsync(model.Email!);
+            
+            var link = QueryHelpers.AddQueryString("https://site.com/password-reset", new Dictionary<string, string?>
+            {
+                { "email", model.Email },
+                { "token", token }
+            });
+
+            var emailTemplate = await _emailTemplateReader.ReadTemplateAsync("ResetPasswordTemplate", new Dictionary<string, object>
+            {
+                { "name", model.Name! },
+                { "link", link }
+            });
+
+            await _emailService.SendAsync(model.Email!, "Reset password", emailTemplate);
+
+            return Ok();
+        }
+
+        [HttpPost("password-reset/verify", Name = "ResetPassword")]
+        public async Task<IActionResult> VerifyPasswordResetTokenAsync([FromBody] VerifyPasswordResetTokenModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
             }
 
-            emailTemplate = emailTemplate
-                .Replace("{{name}}", name)
-                .Replace("{{link}}", link);
+            var resetPasswordRequest = new ResetPasswordRequestDTO
+            {
+                Email = model.Email ?? string.Empty,
+                Token = model.Token ?? string.Empty,
+                Password = model.Password ?? string.Empty,
+            };
 
-            await _emailService.SendAsync(email, "E-mail confirmation", emailTemplate);
+            var result = await _authenticationService.ResetPasswordAsync(resetPasswordRequest);
+
+            return new JsonResult(result);
+        }
+
+        [HttpPost("password-reset/generate-token")]
+        public async Task<IActionResult> GeneratePasswordResetTokenAsync([FromBody] GeneratePasswordResetTokenModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            var token = await _authenticationService.GeneratePasswordResetTokenAsync(model.Email!);
+
+            return Ok(token);
         }
     }
 }

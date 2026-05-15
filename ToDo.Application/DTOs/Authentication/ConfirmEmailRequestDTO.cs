@@ -6,9 +6,9 @@ using System.Threading.Tasks;
 
 namespace ToDo.Application.DTOs.Authentication
 {
-    public class RegisterResultDTO
+    public class ConfirmEmailRequestDTO
     {
-        public bool Succeeded { get; set; }
-        public IDictionary<string, IEnumerable<string>>? Errors { get; set; }
+        public string Email { get; set; } = string.Empty;
+        public string Token { get; set; } = string.Empty;
     }
 }

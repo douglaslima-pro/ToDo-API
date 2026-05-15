@@ -14,6 +14,8 @@ namespace ToDo.Application.Interfaces.Identity
         public Task<LoginResultDTO> LoginAsync(LoginRequestDTO loginRequest);
         public string GenerateAccessTokenAsync(UserDTO user);
         public Task<string> GenerateEmailConfirmationTokenAsync(string email);
-        public Task<ConfirmEmailResultDTO> ConfirmEmailAsync(string? email, string? token);
+        public Task<ConfirmEmailResultDTO> ConfirmEmailAsync(ConfirmEmailRequestDTO confirmEmailRequest);
+        public Task<string> GeneratePasswordResetTokenAsync(string email);
+        public Task<ResetPasswordResultDTO> ResetPasswordAsync(ResetPasswordRequestDTO resetPasswordRequest);
     }
 }

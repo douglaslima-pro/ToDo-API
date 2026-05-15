@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using ToDo.API.Email;
 using ToDo.Infrastructure.IoC;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -44,6 +45,8 @@ builder.Services.AddSingleton<IActionContextAccessor, ActionContextAccessor>();
 builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddInfrastructure(builder.Configuration);
+
+builder.Services.AddScoped<EmailTemplateReader>();
 
 var app = builder.Build();
 

@@ -59,11 +59,15 @@ namespace ToDo.Infrastructure.Data.Identity.Services
             return new RegisterResultDTO
             {
                 Succeeded = result.Succeeded,
-                Errors = result.Succeeded ? [] : result.Errors.Select(e => new RegisterErrorDTO
-                {
-                    Code = e.Code,
-                    Description = e.Description,
-                })
+                Errors = result.Succeeded ? [] : result.Errors
+                    .GroupBy(e =>
+                        e.Code.Contains("UserName") ? "UserName" :
+                        e.Code.Contains("Email") ? "Email" :
+                        e.Code.Contains("Password") ? "Password" :
+                        e.Code.Contains("Token") ? "Token" :
+                        e.Code
+                    )
+                    .ToDictionary(kvp => kvp.Key, kvp => kvp.Select(e => e.Description))
             };
         }
 
@@ -172,27 +176,9 @@ namespace ToDo.Infrastructure.Data.Identity.Services
             return await _userManager.GenerateEmailConfirmationTokenAsync(user);
         }
 
-        public async Task<ConfirmEmailResultDTO> ConfirmEmailAsync(string? email, string? token)
+        public async Task<ConfirmEmailResultDTO> ConfirmEmailAsync(ConfirmEmailRequestDTO confirmEmailRequest)
         {
-            if (string.IsNullOrEmpty(email))
-            {
-                return new ConfirmEmailResultDTO
-                {
-                    Succeeded = false,
-                    Error = "Email is required"
-                };
-            }
-
-            if (string.IsNullOrEmpty(token))
-            {
-                return new ConfirmEmailResultDTO
-                {
-                    Succeeded = false,
-                    Error = "Token is required"
-                };
-            }
-
-            var user = await _userManager.FindByEmailAsync(email);
+            var user = await _userManager.FindByEmailAsync(confirmEmailRequest.Email);
 
             if (user == null)
             {
@@ -203,12 +189,55 @@ namespace ToDo.Infrastructure.Data.Identity.Services
                 };
             }
 
-            var result = await _userManager.ConfirmEmailAsync(user, token);
+            var result = await _userManager.ConfirmEmailAsync(user, confirmEmailRequest.Token);
 
             return new ConfirmEmailResultDTO
             {
                 Succeeded = result.Succeeded,
-                Error = result.Succeeded ? null : "Invalid token"
+                Error = result.Succeeded ? null : "Invalid token",
+            };
+        }
+
+        public async Task<string> GeneratePasswordResetTokenAsync(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+
+            if (user == null)
+            {
+                return string.Empty;
+            }
+
+            return await _userManager.GeneratePasswordResetTokenAsync(user);
+        }
+
+        public async Task<ResetPasswordResultDTO> ResetPasswordAsync(ResetPasswordRequestDTO resetPasswordRequest)
+        {
+            var user = await _userManager.FindByEmailAsync(resetPasswordRequest.Email);
+
+            if (user == null)
+            {
+                return new ResetPasswordResultDTO
+                {
+                    Succeeded = false,
+                    Errors = new Dictionary<string, IEnumerable<string>>
+                    {
+                        { "Token", new[] { "Invalid token" } }
+                    }
+                };
+            }
+
+            var result = await _userManager.ResetPasswordAsync(user, resetPasswordRequest.Token, resetPasswordRequest.Password);
+
+            return new ResetPasswordResultDTO
+            {
+                Succeeded = result.Succeeded,
+                Errors = result.Errors
+                    .GroupBy(e =>
+                        e.Code.Contains("Password") ? "Password" :
+                        e.Code.Contains("Token") ? "Token" :
+                        e.Code
+                    )
+                    .ToDictionary(kvp => kvp.Key, kvp => kvp.Select(e => e.Code.Contains("Token") ? "Invalid token" : e.Description)),
             };
         }
     }
