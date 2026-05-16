@@ -3,12 +3,16 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 using ToDo.API.Email;
+using ToDo.API.Filters;
 using ToDo.Infrastructure.IoC;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-builder.Services.AddControllers()
+builder.Services.AddControllers(options =>
+{
+    options.Filters.Add<ErrorHandlingFilter>();
+})
     .AddNewtonsoftJson(options =>
     {
         options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
