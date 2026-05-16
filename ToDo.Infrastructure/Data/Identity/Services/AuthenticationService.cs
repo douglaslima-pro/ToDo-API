@@ -240,5 +240,12 @@ namespace ToDo.Infrastructure.Data.Identity.Services
                     .ToDictionary(kvp => kvp.Key, kvp => kvp.Select(e => e.Code.Contains("Token") ? "Invalid token" : e.Description)),
             };
         }
+
+        public async Task<bool> ExistsByEmailAsync(string email)
+        {
+            var user = await _userManager.FindByEmailAsync(email);
+
+            return user != null;
+        }
     }
 }

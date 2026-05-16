@@ -101,6 +101,13 @@ namespace ToDo.API.Controllers
                 return BadRequest(ModelState);
             }
 
+            var exists = await _authenticationService.ExistsByEmailAsync(model.Email!);
+
+            if (!exists)
+            {
+                return Ok();
+            }
+
             var token = await _authenticationService.GenerateEmailConfirmationTokenAsync(model.Email!);
 
             var link = QueryHelpers.AddQueryString("https://site.com/email-confirmation", new Dictionary<string, string?>
@@ -141,19 +148,6 @@ namespace ToDo.API.Controllers
             return new JsonResult(result);
         }
 
-        [HttpPost("email-confirmation/generate-token")]
-        public async Task<IActionResult> GenerateEmailConfirmationTokenAsync([FromBody] GenerateEmailConfirmationTokenModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var token = await _authenticationService.GenerateEmailConfirmationTokenAsync(model.Email!);
-
-            return Ok(token);
-        }
-
         [HttpPost("password-reset/send")]
         public async Task<IActionResult> SendPasswordResetTokenAsync([FromBody] SendPasswordResetTokenModel model)
         {
@@ -161,6 +155,14 @@ namespace ToDo.API.Controllers
             {
                 return BadRequest(ModelState);
             }
+
+            var exists = await _authenticationService.ExistsByEmailAsync(model.Email!);
+
+            if (!exists)
+            {
+                return Ok();
+            }
+
             var token = await _authenticationService.GeneratePasswordResetTokenAsync(model.Email!);
             
             var link = QueryHelpers.AddQueryString("https://site.com/password-reset", new Dictionary<string, string?>
@@ -198,19 +200,6 @@ namespace ToDo.API.Controllers
             var result = await _authenticationService.ResetPasswordAsync(resetPasswordRequest);
 
             return new JsonResult(result);
-        }
-
-        [HttpPost("password-reset/generate-token")]
-        public async Task<IActionResult> GeneratePasswordResetTokenAsync([FromBody] GeneratePasswordResetTokenModel model)
-        {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
-            var token = await _authenticationService.GeneratePasswordResetTokenAsync(model.Email!);
-
-            return Ok(token);
         }
     }
 }
