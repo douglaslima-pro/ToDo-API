@@ -4,12 +4,10 @@ WORKDIR /opt/todo-api
 
 COPY . .
 
-RUN ls
 RUN dotnet restore
 
 WORKDIR ToDo.API
 
-RUN ls
 RUN dotnet build
 RUN dotnet publish -r linux-x64 -o publish
 
