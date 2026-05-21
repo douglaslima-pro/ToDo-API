@@ -22,6 +22,9 @@ services:
         restart: true
         condition: service_started
         required: true
+    networks:
+      - default
+      - backend
 
   db:
     container_name: todo-db
@@ -29,12 +32,21 @@ services:
     environment:
       - ACCEPT_EULA=Y
       - MSSQL_SA_PASSWORD=${MSSQL_SA_PASSWORD:?MSSQL_SA_PASSWORD environment variable is missing}
-    ports:
-      - "1434:1433"
     shm_size: 1g
     volumes:
       - db-data:/var/opt/mssql
+    networks:
+      - backend
 
 volumes:
   db-data:
     name: todo-db-data
+
+networks:
+  default:
+    name: todo-default
+    driver: bridge
+  backend:
+    name: todo-backend
+    driver: bridge
+    internal: true
