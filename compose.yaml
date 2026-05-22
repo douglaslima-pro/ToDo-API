@@ -11,7 +11,10 @@ services:
       - "8080:8080"
     environment:
       - ConnectionStrings__ToDoConnectionString=Server=db;Database=${DB_NAME:?DB_NAME environment variable is missing};User Id=${DB_USER:?DB_USER environment variable is missing};Password=${MSSQL_SA_PASSWORD:?MSSQL_SA_PASSWORD environment variable is missing};Encrypt=true;TrustServerCertificate=true;
-      - EmailSettings__Email=${EmailSettings__Email:?EmailSettings__Email is missing}
+      - EmailSettings__Host=${EmailSettings__Host:?EmailSettings__Host is missing}
+      - EmailSettings__Port=${EmailSettings__Port:?EmailSettings__Port is missing}
+      - EmailSettings__From=${EmailSettings__From:?EmailSettings__From is missing}
+      - EmailSettings__UserName=${EmailSettings__UserName:?EmailSettings__UserName is missing}
       - EmailSettings__Password=${EmailSettings__Password:?EmailSettings__Password is missing}
       - Jwt__Audience=${Jwt__Audience:?Jwt__Audience environment variable is missing}
       - Jwt__Issuer=${Jwt__Issuer:?Jwt__Issuer environment variable is missing}
