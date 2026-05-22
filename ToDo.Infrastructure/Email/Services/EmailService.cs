@@ -21,13 +21,19 @@ namespace ToDo.Infrastructure.Email.Services
         private readonly IConfiguration _configuration;
 
         // Email Settings
+        private readonly string _host;
+        private readonly int _port;
+        private readonly string _from;
         private readonly string _email;
         private readonly string _password;
 
         public EmailService(IConfiguration configuration)
         {
             _configuration = configuration;
-            _email = _configuration["EmailSettings:Email"]!;
+            _host = _configuration["EmailSettings:Host"]!;
+            _port = Convert.ToInt32(_configuration["EmailSettings:Port"]);
+            _from = _configuration["EmailSettings:From"]!;
+            _email = _configuration["EmailSettings:UserName"]!;
             _password = _configuration["EmailSettings:Password"]!;
         }
 
@@ -42,10 +48,10 @@ namespace ToDo.Infrastructure.Email.Services
                 }
             };
             message.To.Add(new MailboxAddress("", to));
-            message.From.Add(new MailboxAddress("ToDo App", _email));
+            message.From.Add(new MailboxAddress("ToDo App", _from));
 
             using var smtpClient = new SmtpClient();
-            await smtpClient.ConnectAsync("smtp.gmail.com", 587, SecureSocketOptions.StartTls);
+            await smtpClient.ConnectAsync(_host, _port, SecureSocketOptions.StartTls);
 
             await smtpClient.AuthenticateAsync(_email, _password);
 
