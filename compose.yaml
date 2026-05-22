@@ -8,7 +8,7 @@ services:
       context: .
       dockerfile: Dockerfile
     ports:
-      - "8080:8080"
+      - "127.0.0.1:8080:8080"
     environment:
       - ConnectionStrings__ToDoConnectionString=Server=db;Database=${DB_NAME:?DB_NAME environment variable is missing};User Id=${DB_USER:?DB_USER environment variable is missing};Password=${MSSQL_SA_PASSWORD:?MSSQL_SA_PASSWORD environment variable is missing};Encrypt=true;TrustServerCertificate=true;
       - EmailSettings__Host=${EmailSettings__Host:?EmailSettings__Host is missing}
