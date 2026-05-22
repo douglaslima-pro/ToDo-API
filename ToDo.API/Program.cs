@@ -2,6 +2,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
+using Serilog;
 using ToDo.API.Email;
 using ToDo.API.Filters;
 using ToDo.Infrastructure.IoC;
@@ -51,6 +52,14 @@ builder.Services.AddHttpContextAccessor();
 builder.Services.AddInfrastructure(builder.Configuration);
 
 builder.Services.AddScoped<EmailTemplateReader>();
+
+Log.Logger = new LoggerConfiguration()
+    .MinimumLevel.Information()
+    .WriteTo.Console()
+    .WriteTo.File("logs/log-.txt", rollingInterval: RollingInterval.Day, flushToDiskInterval: TimeSpan.FromSeconds(1))
+    .CreateLogger();
+
+builder.Services.AddSerilog();
 
 var app = builder.Build();
 
