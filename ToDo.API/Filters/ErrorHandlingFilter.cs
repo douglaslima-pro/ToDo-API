@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using Serilog;
 
 namespace ToDo.API.Filters
 {
@@ -8,6 +9,8 @@ namespace ToDo.API.Filters
     {
         public void OnException(ExceptionContext context)
         {
+            Log.Error(context.Exception, context.Exception.Message);
+
             var exception = context.Exception;
 
             context.Result = new ObjectResult(new ProblemDetails
