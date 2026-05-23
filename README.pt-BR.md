@@ -3,14 +3,14 @@
 [![English](https://img.shields.io/badge/lang-en-red.svg)](README.md)
 [![Português](https://img.shields.io/badge/lang-pt--br-green.svg)](README.pt-BR.md)
 
-RESTful API for task management (To-Do) built with ASP.NET Core and .NET 9.0.  
-The application includes JWT Bearer authentication, SQL Server integration, and identity confirmation mechanisms via e-mail using MailKit.
+API RESTful para gerenciamento de tarefas (To-Do) desenvolvida com ASP.NET Core e .NET 9.0.  
+A aplicação possui autenticação JWT Bearer, integração com SQL Server e mecanismos de confirmação de identidade via e-mail utilizando MailKit.
 
-The project was developed following software engineering best practices, including Clean Code and Domain-Driven Design (DDD).
+O projeto foi construído seguindo boas práticas de desenvolvimento de software, incluindo Clean Code e Domain-Driven Design (DDD).
 
 ---
 
-## Technologies
+## Tecnologias utilizadas
 
 - ASP.NET Core (.NET 9.0)
 - SQL Server
@@ -21,23 +21,23 @@ The project was developed following software engineering best practices, includi
 
 ---
 
-# Features
+## Funcionalidades
 
-- User registration
-- JWT authentication
-- E-mail confirmation
-- Password recovery
-- Password reset via token
-- SQL Server database integration
-- OpenAPI (Swagger) documentation
+- Registro de usuários
+- Login com autenticação JWT
+- Confirmação de e-mail
+- Recuperação de senha
+- Reset de senha via token
+- Integração com banco de dados SQL Server
+- Documentação OpenAPI (Swagger)
 
 ---
 
 # Endpoints
 
-## Authentication
+## Autenticação
 
-### Register user
+### Registrar usuário
 
 `POST /api/authentication/register`
 
@@ -72,7 +72,7 @@ The project was developed following software engineering best practices, includi
 
 ---
 
-### Send e-mail confirmation token
+### Enviar token de confirmação de e-mail
 
 `POST /api/authentication/email-confirmation/send`
 
@@ -87,7 +87,7 @@ The project was developed following software engineering best practices, includi
 
 ---
 
-### Confirm e-mail
+### Confirmar e-mail
 
 `POST /api/authentication/email-confirmation/verify`
 
@@ -102,7 +102,7 @@ The project was developed following software engineering best practices, includi
 
 ---
 
-### Send password reset token
+### Enviar token de recuperação de senha
 
 `POST /api/authentication/password-reset/send`
 
@@ -117,7 +117,7 @@ The project was developed following software engineering best practices, includi
 
 ---
 
-### Reset password
+### Redefinir senha
 
 `POST /api/authentication/password-reset/verify`
 
@@ -133,11 +133,11 @@ The project was developed following software engineering best practices, includi
 
 ---
 
-# Authentication
+# Autenticação
 
-The API uses JWT Bearer authentication.
+A API utiliza autenticação do tipo JWT Bearer.
 
-Example header:
+Exemplo de header:
 
 ```http
 Authorization: Bearer {token}
@@ -145,7 +145,7 @@ Authorization: Bearer {token}
 
 ---
 
-# Running the project
+# Executando o projeto
 
 ## Docker
 
@@ -155,27 +155,27 @@ docker compose up -d
 
 ---
 
-# Swagger Documentation
+# Documentação Swagger
 
-After starting the application, the OpenAPI documentation will be available at:
+Após executar a aplicação, a documentação OpenAPI estará disponível em:
 
 ```txt
-http://localhost:{port}/swagger
+http://localhost:{porta}/swagger
 ```
 
 ---
 
-# Architecture
+# Arquitetura
 
-The project follows concepts such as:
+O projeto segue conceitos de:
 
 - Clean Code
 - Domain-Driven Design (DDD)
-- Layered architecture
-- RESTful API best practices
+- Separação por camadas
+- Boas práticas para APIs RESTful
 
 ---
 
-# License
+# Licença
 
-This project is available for study and portfolio purposes.
+Este projeto está disponível para fins de estudo e portfólio.
