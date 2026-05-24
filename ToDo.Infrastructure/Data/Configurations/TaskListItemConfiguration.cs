@@ -5,7 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
-using ToDo.Domain.Entities.TaskLists;
+using ToDo.Domain.Entities.Tasks;
 
 namespace ToDo.Infrastructure.Data.Configurations
 {

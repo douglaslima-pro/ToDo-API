@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using ToDo.Application.Abstractions.Validators;
 using ToDo.Domain.Common.Notification;
-using ToDo.Domain.Entities.TaskLists;
+using ToDo.Domain.Entities.Tasks;
 
 namespace ToDo.Application.Features.Tasks.Validators
 {
@@ -24,34 +24,39 @@ namespace ToDo.Application.Features.Tasks.Validators
             // title
             if (string.IsNullOrWhiteSpace(taskListItem.Title))
             {
-                _domainNotification.AddError("Title", "Title is required.");
+                _domainNotification.AddError("Title", "Title is required");
+            }
+
+            if (taskListItem.Title.Length < 5)
+            {
+                _domainNotification.AddError("Title", "Title must be at least 5 characters long");
             }
 
             if (taskListItem.Title.Length > 100)
             {
-                _domainNotification.AddError("Title", "Title must be less than 100 characters.");
+                _domainNotification.AddError("Title", "Title must be at most 100 characters long");
             }
 
             // description
             if (string.IsNullOrWhiteSpace(taskListItem.Description))
             {
-                _domainNotification.AddError("Description", "Description is required.");
+                _domainNotification.AddError("Description", "Description is required");
             }
 
             if (taskListItem.Description.Length < 5)
             {
-                _domainNotification.AddError("Description", "Description must be greater than 5 characters.");
+                _domainNotification.AddError("Description", "Description must be at least 5 characters long");
             }
 
             if (taskListItem.Description.Length > 500)
             {
-                _domainNotification.AddError("Description", "Description must be less than 500 characters.");
+                _domainNotification.AddError("Description", "Description must be at most 500 characters long");
             }
 
             // due date
             if (taskListItem.DueDate <= DateTime.UtcNow)
             {
-                _domainNotification.AddError("DueDate", "Due date must be in the future.");
+                _domainNotification.AddError("DueDate", "Due date must be in the future");
             }
 
             return !_domainNotification.HasErrors();

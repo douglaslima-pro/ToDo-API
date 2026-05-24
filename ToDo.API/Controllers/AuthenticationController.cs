@@ -68,11 +68,6 @@ namespace ToDo.API.Controllers
         [HttpPost("[action]")]
         public async Task<IActionResult> LoginAsync([FromBody] LoginRequestModel body)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
             var loginRequest = new LoginRequestDTO
             {
                 Email = body.Email ?? string.Empty,
@@ -97,11 +92,6 @@ namespace ToDo.API.Controllers
         [HttpPost("email-confirmation/send")]
         public async Task<IActionResult> SendEmailConfirmationTokenAsync([FromBody] SendEmailConfirmationTokenModel model)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
             var exists = await _authenticationService.ExistsByEmailAsync(model.Email!);
 
             if (!exists)
@@ -140,11 +130,6 @@ namespace ToDo.API.Controllers
         [HttpPost("email-confirmation/verify", Name = "ConfirmEmail")]
         public async Task<IActionResult> VerifyEmailConfirmationTokenAsync([FromBody] VerifyEmailConfirmationTokenModel model)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
             var confirmEmailRequest = new ConfirmEmailRequestDTO
             {
                 Email = model.Email ?? string.Empty,
@@ -159,11 +144,6 @@ namespace ToDo.API.Controllers
         [HttpPost("password-reset/send")]
         public async Task<IActionResult> SendPasswordResetTokenAsync([FromBody] SendPasswordResetTokenModel model)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
             var exists = await _authenticationService.ExistsByEmailAsync(model.Email!);
 
             if (!exists)
@@ -200,11 +180,6 @@ namespace ToDo.API.Controllers
         [HttpPost("password-reset/verify", Name = "ResetPassword")]
         public async Task<IActionResult> VerifyPasswordResetTokenAsync([FromBody] VerifyPasswordResetTokenModel model)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
             var resetPasswordRequest = new ResetPasswordRequestDTO
             {
                 Email = model.Email ?? string.Empty,

@@ -5,7 +5,7 @@ using System.Linq.Expressions;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
-using ToDo.Domain.Entities.TaskLists;
+using ToDo.Domain.Entities.Tasks;
 using ToDo.Domain.Repositories;
 using ToDo.Infrastructure.Data.Contexts;
 using ToDo.Infrastructure.Data.Repositories.Base;
@@ -16,11 +16,14 @@ namespace ToDo.Infrastructure.Data.Repositories
     {
         public TaskListRepository(ToDoDBContext context) : base(context) { }
 
-        public async Task<IEnumerable<TaskListItem>> GetAllTasksFromListAsync(int taskListId, Expression<Func<TaskListItem, object>>? orderByExpression = null, bool isAscending = true, int start = 0, int length = 10)
+        public async Task<TaskListItem?> GetTaskByIdAsync(int id)
         {
-            IQueryable<TaskListItem> query = _context
-                .Set<TaskListItem>()
-                .AsQueryable();
+            return await _context.TaskListItem.FindAsync(id);
+        }
+
+        public async Task<IEnumerable<TaskListItem>> GetAllTasksFromListAsync(int taskListId, Expression<Func<TaskListItem, object?>>? orderByExpression = null, bool isAscending = true, int start = 0, int length = 10)
+        {
+            IQueryable<TaskListItem> query = _context.TaskListItem.AsQueryable();
 
             query = query.Where(t => t.Id == taskListId);
 

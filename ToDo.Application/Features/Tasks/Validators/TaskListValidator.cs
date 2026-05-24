@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ToDo.Domain.Entities.TaskLists;
+using ToDo.Domain.Entities.Tasks;
 using ToDo.Domain.Common.Notification;
 using ToDo.Application.Abstractions.Validators;
 
@@ -22,12 +22,17 @@ namespace ToDo.Application.Features.Tasks.Validators
         {
             if (string.IsNullOrWhiteSpace(taskList.Title))
             {
-                _domainNotification.AddError("Title", "Title is required.");
+                _domainNotification.AddError("Title", "Title is required");
+            }
+
+            if (taskList.Title.Length < 5)
+            {
+                _domainNotification.AddError("Title", "Title must be at least 5 characters long");
             }
 
             if (taskList.Title.Length > 100)
             {
-                _domainNotification.AddError("Title", "Title must be less than 100 characters.");
+                _domainNotification.AddError("Title", "Title must be at most 100 characters long");
             }
 
             return !_domainNotification.HasErrors();

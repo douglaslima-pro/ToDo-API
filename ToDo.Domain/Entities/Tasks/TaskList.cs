@@ -4,18 +4,23 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Text;
 
-namespace ToDo.Domain.Entities.TaskLists
+namespace ToDo.Domain.Entities.Tasks
 {
     public class TaskList : AggregateRoot
     {
         public int Id { get; private set; }
         public string Title { get; private set; }
         public int UserId { get; private set; }
-        public DateTime CreatedAt { get; private set; }
+        public DateTime? CreatedAt { get; private set; }
 
         // relationships
         private readonly List<TaskListItem> _tasks = [];
         public IReadOnlyCollection<TaskListItem> Tasks => _tasks;
+
+        private TaskList()
+        {
+            Title = string.Empty; 
+        }
 
         public TaskList(string title, int userId)
         {

@@ -12,7 +12,10 @@ namespace ToDo.Application.Features.Tasks.Services
 {
     public class TaskListItemService : ITaskListItemService
     {
+        // repositories
         private readonly ITaskListRepository _taskListRepository;
+
+        // validators
         private readonly TaskListItemValidator _taskListItemValidator;
 
         public TaskListItemService(
@@ -21,6 +24,26 @@ namespace ToDo.Application.Features.Tasks.Services
         {
             _taskListRepository = taskListRepository;
             _taskListItemValidator = taskListItemValidator;
+        }
+
+        public async Task<TaskListItemDTO?> GetByIdAsync(int id)
+        {
+            var task = await _taskListRepository.GetTaskByIdAsync(id);
+            
+            if (task == null)
+            {
+                return null;
+            }
+            
+            return new TaskListItemDTO
+            {
+                Id = task.Id,
+                Title = task.Title,
+                Description = task.Description,
+                IsCompleted = task.IsCompleted,
+                CreatedAt = task.CreatedAt,
+                DueDate = task.DueDate,
+            };
         }
 
         public async Task<IEnumerable<TaskListItemDTO>> GetAllAsync(int taskListId, int start = 0, int length = 5)
@@ -59,6 +82,8 @@ namespace ToDo.Application.Features.Tasks.Services
             {
                 return;
             }
+
+            _taskListRepository.Update(taskList);
 
             await _taskListRepository.SaveChangesAsync();
         }

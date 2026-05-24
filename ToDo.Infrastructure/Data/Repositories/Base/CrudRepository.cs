@@ -48,7 +48,7 @@ namespace ToDo.Infrastructure.Data.Repositories.Base
 
         public async Task<TEntity?> GetByIdAsync(TKey id) => await _entity.FindAsync(id);
 
-        public async Task<TEntity?> GetAsync(Expression<Func<TEntity, bool>>? searchExpression = null, Expression<Func<TEntity, object>>? orderByExpression = null, string[]? includeExpression = null, bool isAscending = true)
+        public async Task<TEntity?> GetAsync(Expression<Func<TEntity, bool>>? searchExpression = null, Expression<Func<TEntity, object?>>? orderByExpression = null, string[]? includeExpression = null, bool isAscending = true)
         {
             IQueryable<TEntity> query = _entity.AsQueryable();
 
@@ -61,11 +61,11 @@ namespace ToDo.Infrastructure.Data.Repositories.Base
             {
                 if (isAscending)
                 {
-                    query.OrderBy(orderByExpression);
+                    query = query.OrderBy(orderByExpression);
                 }
                 else
                 {
-                    query.OrderByDescending(orderByExpression);
+                    query = query.OrderByDescending(orderByExpression);
                 }
             }
 
@@ -80,7 +80,7 @@ namespace ToDo.Infrastructure.Data.Repositories.Base
             return await query.FirstOrDefaultAsync();
         }
 
-        public async Task<IEnumerable<TEntity>> GetManyAsync(Expression<Func<TEntity, bool>>? searchExpression = null, Expression<Func<TEntity, object>>? orderByExpression = null, string[]? includeExpression = null, bool isAscending = true)
+        public async Task<IEnumerable<TEntity>> GetManyAsync(Expression<Func<TEntity, bool>>? searchExpression = null, Expression<Func<TEntity, object?>>? orderByExpression = null, string[]? includeExpression = null, bool isAscending = true)
         {
             IQueryable<TEntity> query = _entity.AsQueryable();
 
@@ -93,11 +93,11 @@ namespace ToDo.Infrastructure.Data.Repositories.Base
             {
                 if (isAscending)
                 {
-                    query.OrderBy(orderByExpression);
+                    query = query.OrderBy(orderByExpression);
                 }
                 else
                 {
-                    query.OrderByDescending(orderByExpression);
+                    query = query.OrderByDescending(orderByExpression);
                 }
             }
 
@@ -112,7 +112,7 @@ namespace ToDo.Infrastructure.Data.Repositories.Base
             return await query.ToListAsync();
         }
 
-        public async Task<IEnumerable<TEntity>> GetPagedAsync(Expression<Func<TEntity, bool>>? searchExpression = null, Expression<Func<TEntity, object>>? orderByExpression = null, string[]? includeExpression = null, bool isAscending = true, int start = 0, int length = 10)
+        public async Task<IEnumerable<TEntity>> GetPagedAsync(Expression<Func<TEntity, bool>>? searchExpression = null, Expression<Func<TEntity, object?>>? orderByExpression = null, string[]? includeExpression = null, bool isAscending = true, int start = 0, int length = 10)
         {
             IQueryable<TEntity> query = _entity.AsQueryable();
 
@@ -125,11 +125,11 @@ namespace ToDo.Infrastructure.Data.Repositories.Base
             {
                 if (isAscending)
                 {
-                    query.OrderBy(orderByExpression);
+                    query = query.OrderBy(orderByExpression);
                 }
                 else
                 {
-                    query.OrderByDescending(orderByExpression);
+                    query = query.OrderByDescending(orderByExpression);
                 }
             }
 

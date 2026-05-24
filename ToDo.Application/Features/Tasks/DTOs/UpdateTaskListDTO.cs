@@ -6,9 +6,10 @@ using System.Threading.Tasks;
 
 namespace ToDo.Application.Features.Tasks.DTOs
 {
-    public class EditTaskListDTO
+    public class UpdateTaskListDTO
     {
         public int Id { get; set; }
         public string Title { get; set; } = string.Empty;
+        public int UserId { get; set; }
     }
 }

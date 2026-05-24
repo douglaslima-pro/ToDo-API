@@ -19,19 +19,19 @@ namespace ToDo.Domain.Repositories.Base
 
         public Task<TEntity?> GetAsync(
             Expression<Func<TEntity, bool>>? searchExpression = null,
-            Expression<Func<TEntity, object>>? orderByExpression = null,
+            Expression<Func<TEntity, object?>>? orderByExpression = null,
             string[]? includeExpression = null,
             bool isAscending = true);
 
         public Task<IEnumerable<TEntity>> GetManyAsync(
             Expression<Func<TEntity, bool>>? searchExpression = null,
-            Expression<Func<TEntity, object>>? orderByExpression = null,
+            Expression<Func<TEntity, object?>>? orderByExpression = null,
             string[]? includeExpression = null,
             bool isAscending = true);
 
         public Task<IEnumerable<TEntity>> GetPagedAsync(
             Expression<Func<TEntity, bool>>? searchExpression = null,
-            Expression<Func<TEntity, object>>? orderByExpression = null,
+            Expression<Func<TEntity, object?>>? orderByExpression = null,
             string[]? includeExpression = null,
             bool isAscending = true,
             int start = 0,

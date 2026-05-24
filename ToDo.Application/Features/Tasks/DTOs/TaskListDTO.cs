@@ -10,7 +10,7 @@ namespace ToDo.Application.Features.Tasks.DTOs
     {
         public int Id { get; set; }
         public string? Title { get; set; }
-        public DateTime CreatedAt { get; set; }
+        public DateTime? CreatedAt { get; set; }
         public int TasksCount { get; set; }
     }
 }

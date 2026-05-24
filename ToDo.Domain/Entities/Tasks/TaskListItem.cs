@@ -6,20 +6,26 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ToDo.Domain.Entities.TaskLists
+namespace ToDo.Domain.Entities.Tasks
 {
     public class TaskListItem
     {
         public int Id { get; private set; }
         public string Title { get; private set; }
         public string Description { get; private set; }
-        public bool IsCompleted { get; private set; }
-        public DateTime CreatedAt { get; private set; }
+        public bool? IsCompleted { get; private set; }
+        public DateTime? CreatedAt { get; private set; }
         public DateTime DueDate { get; private set; }
         public int TaskListId { get; private set; }
 
         // relationships
         public TaskList? TaskList { get; private set; }
+
+        private TaskListItem()
+        {
+            Title = string.Empty;
+            Description = string.Empty;
+        }
 
         public TaskListItem(string title, string description, DateTime dueDate, TaskList taskList)
         {

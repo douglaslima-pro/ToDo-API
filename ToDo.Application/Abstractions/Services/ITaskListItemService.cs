@@ -9,7 +9,7 @@ namespace ToDo.Application.Abstractions.Services
 {
     public interface ITaskListItemService
     {
-        Task<TaskListItemDTO> GetByIdAsync(int id);
+        Task<TaskListItemDTO?> GetByIdAsync(int id);
         Task<IEnumerable<TaskListItemDTO>> GetAllAsync(int taskListId, int start = 0, int length = 5);
         Task CreateAsync(CreateTaskListItemDTO model);
     }

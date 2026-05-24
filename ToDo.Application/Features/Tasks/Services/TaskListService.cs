@@ -3,7 +3,7 @@ using System.Reflection;
 using ToDo.Application.Abstractions.Services;
 using ToDo.Application.Features.Tasks.DTOs;
 using ToDo.Application.Features.Tasks.Validators;
-using ToDo.Domain.Entities.TaskLists;
+using ToDo.Domain.Entities.Tasks;
 using ToDo.Domain.Repositories;
 
 namespace ToDo.Application.Features.Tasks.Services
@@ -15,23 +15,20 @@ namespace ToDo.Application.Features.Tasks.Services
 
         // validators
         private readonly TaskListValidator _taskListValidator;
-        private readonly TaskListItemValidator _taskListItemValidator;
 
         public TaskListService(
             ITaskListRepository taskListRepository,
-            TaskListValidator taskListValidator,
-            TaskListItemValidator taskListItemValidator)
+            TaskListValidator taskListValidator)
         {
             _taskListRepository = taskListRepository;
             _taskListValidator = taskListValidator;
-            _taskListItemValidator = taskListItemValidator;
         }
 
         public async Task<IEnumerable<TaskListDTO>> GetAllAsync(int userId, int start = 0, int length = 5)
         {
             var taskLists = await _taskListRepository.GetPagedAsync(
-                    searchExpression: (t) => t.UserId == userId,
-                    orderByExpression: (t) => t.CreatedAt,
+                    searchExpression: t => t.UserId == userId,
+                    orderByExpression: t => t.CreatedAt,
                     includeExpression: ["Tasks"],
                     isAscending: false,
                     start: start,
@@ -56,39 +53,48 @@ namespace ToDo.Application.Features.Tasks.Services
                 return;
             }
 
+            _taskListRepository.Create(taskList);
+
             await _taskListRepository.SaveChangesAsync();
         }
 
-        public async Task EditAsync(EditTaskListDTO model)
+        public async Task<bool> UpdateAsync(UpdateTaskListDTO model)
         {
             var taskList = await _taskListRepository.GetByIdAsync(model.Id);
 
             if (taskList == null)
             {
-                return;
+                return false;
             }
 
             taskList.Rename(model.Title);
 
             if (!_taskListValidator.Validate(taskList))
             {
-                return;
+                return false;
             }
 
+            _taskListRepository.Update(taskList);
+
             await _taskListRepository.SaveChangesAsync();
+
+            return true;
         }
 
-        public async Task DeleteAsync(int id)
+        public async Task<bool> DeleteAsync(int id)
         {
             var taskList = await _taskListRepository.GetByIdAsync(id);
 
             if (taskList == null)
             {
-                return;
+                return false;
             }
 
             _taskListRepository.Delete(taskList);
+
             await _taskListRepository.SaveChangesAsync();
+
+            return true;
         }
     }
 }
