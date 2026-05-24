@@ -6,10 +6,11 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using ToDo.API.Email;
 using ToDo.API.Models.Authentication;
-using ToDo.Application.DTOs.Authentication;
-using ToDo.Application.Enums;
-using ToDo.Application.Interfaces.Email;
-using ToDo.Application.Interfaces.Identity;
+using ToDo.Application.Common.Enums;
+using ToDo.Application.Abstractions.Email.Services;
+using ToDo.Application.Abstractions.Email.DTOs;
+using ToDo.Application.Abstractions.Identity.Services;
+using ToDo.Application.Abstractions.Identity.DTOs;
 
 namespace ToDo.API.Controllers
 {
@@ -124,7 +125,14 @@ namespace ToDo.API.Controllers
 
             var emailTemplate = await _emailTemplateReader.ReadTemplateAsync("EmailConfirmationTemplate", emailTemplateValues);
 
-            await _emailService.SendAsync(model.Email!, "E-mail confirmation", emailTemplate);
+            var emailMessage = new EmailMessageDTO
+            {
+                To = model.Email!,
+                Subject = "E-mail confirmation",
+                Body = emailTemplate
+            };
+
+            await _emailService.SendAsync(emailMessage);
 
             return Ok();
         }
@@ -177,7 +185,14 @@ namespace ToDo.API.Controllers
                 { "link", link }
             });
 
-            await _emailService.SendAsync(model.Email!, "Reset password", emailTemplate);
+            var emailMessage = new EmailMessageDTO
+            {
+                To = model.Email!,
+                Subject = "Reset password",
+                Body = emailTemplate
+            };
+
+            await _emailService.SendAsync(emailMessage);
 
             return Ok();
         }

@@ -45,7 +45,9 @@ namespace ToDo.Infrastructure.Data.Repositories.Base
             }
         }
 
-        public async Task<TEntity?> GetAsync(Expression<Func<TEntity, bool>>? searchExpression = null, Expression<Func<TEntity, object>>? orderByExpression = null, bool isAscending = true)
+        public async Task<TEntity?> GetByIdAsync(TKey id) => await _entity.FindAsync(id);
+
+        public async Task<TEntity?> GetAsync(Expression<Func<TEntity, bool>>? searchExpression = null, Expression<Func<TEntity, object>>? orderByExpression = null, string[]? includeExpression = null, bool isAscending = true)
         {
             IQueryable<TEntity> query = _entity.AsQueryable();
 
@@ -63,15 +65,21 @@ namespace ToDo.Infrastructure.Data.Repositories.Base
                 else
                 {
                     query.OrderByDescending(orderByExpression);
+                }
+            }
+
+            if (includeExpression != null)
+            {
+                foreach (var include in includeExpression)
+                {
+                    query = query.Include(include);
                 }
             }
 
             return await query.FirstOrDefaultAsync();
         }
 
-        public async Task<TEntity?> GetByIdAsync(TKey id) => await _entity.FindAsync(id);
-
-        public async Task<IEnumerable<TEntity>> GetManyAsync(Expression<Func<TEntity, bool>>? searchExpression = null, Expression<Func<TEntity, object>>? orderByExpression = null, bool isAscending = true)
+        public async Task<IEnumerable<TEntity>> GetManyAsync(Expression<Func<TEntity, bool>>? searchExpression = null, Expression<Func<TEntity, object>>? orderByExpression = null, string[]? includeExpression = null, bool isAscending = true)
         {
             IQueryable<TEntity> query = _entity.AsQueryable();
 
@@ -89,13 +97,21 @@ namespace ToDo.Infrastructure.Data.Repositories.Base
                 else
                 {
                     query.OrderByDescending(orderByExpression);
+                }
+            }
+
+            if (includeExpression != null)
+            {
+                foreach (var include in includeExpression)
+                {
+                    query = query.Include(include);
                 }
             }
 
             return await query.ToListAsync();
         }
 
-        public async Task<IEnumerable<TEntity>> GetPagedAsync(Expression<Func<TEntity, bool>>? searchExpression = null, Expression<Func<TEntity, object>>? orderByExpression = null, bool isAscending = true, int start = 0, int length = 10)
+        public async Task<IEnumerable<TEntity>> GetPagedAsync(Expression<Func<TEntity, bool>>? searchExpression = null, Expression<Func<TEntity, object>>? orderByExpression = null, string[]? includeExpression = null, bool isAscending = true, int start = 0, int length = 10)
         {
             IQueryable<TEntity> query = _entity.AsQueryable();
 
@@ -113,6 +129,14 @@ namespace ToDo.Infrastructure.Data.Repositories.Base
                 else
                 {
                     query.OrderByDescending(orderByExpression);
+                }
+            }
+
+            if (includeExpression != null)
+            {
+                foreach (var include in includeExpression)
+                {
+                    query = query.Include(include);
                 }
             }
 

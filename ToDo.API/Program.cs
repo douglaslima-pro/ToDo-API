@@ -13,7 +13,8 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers(options =>
 {
-    options.Filters.Add<ErrorHandlingFilter>();
+    options.Filters.Add<UncaughtExceptionFilter>();
+    options.Filters.Add<DomainErrorsFilter>();
 })
     .AddNewtonsoftJson(options =>
     {

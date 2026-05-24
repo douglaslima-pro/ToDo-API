@@ -8,11 +8,12 @@ using Microsoft.AspNetCore.Mvc.Infrastructure;
 using Microsoft.AspNetCore.Mvc.Routing;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
-using ToDo.Application.Interfaces.Email;
 using MailKit.Security;
 using MimeKit.Text;
 using MimeKit;
 using MailKit.Net.Smtp;
+using ToDo.Application.Abstractions.Email.Services;
+using ToDo.Application.Abstractions.Email.DTOs;
 
 namespace ToDo.Infrastructure.Email.Services
 {
@@ -37,17 +38,17 @@ namespace ToDo.Infrastructure.Email.Services
             _password = _configuration["EmailSettings:Password"]!;
         }
 
-        public async Task SendAsync(string to, string subject, string body, bool isHtml = true)
+        public async Task SendAsync(EmailMessageDTO emailMessage)
         {
             var message = new MimeMessage
             {
-                Subject = subject,
-                Body = new TextPart(isHtml ? TextFormat.Html : TextFormat.Plain)
+                Subject = emailMessage.Subject,
+                Body = new TextPart(emailMessage.IsHtml ? TextFormat.Html : TextFormat.Plain)
                 {
-                    Text = body,
+                    Text = emailMessage.Body,
                 }
             };
-            message.To.Add(new MailboxAddress("", to));
+            message.To.Add(new MailboxAddress("", emailMessage.To));
             message.From.Add(new MailboxAddress("ToDo App", _from));
 
             using var smtpClient = new SmtpClient();

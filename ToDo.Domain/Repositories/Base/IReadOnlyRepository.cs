@@ -12,10 +12,29 @@ namespace ToDo.Domain.Repositories.Base
         where TEntity : AggregateRoot
     {
         public Task<int> CountAsync(Expression<Func<TEntity, bool>>? searchExpression = null);
+
         public Task<bool> ExistsAsync(Expression<Func<TEntity, bool>>? searchExpression = null);
-        public Task<TEntity?> GetAsync(Expression<Func<TEntity, bool>>? searchExpression = null, Expression<Func<TEntity, object>>? orderByExpression = null, bool isAscending = true);
+
         public Task<TEntity?> GetByIdAsync(TKey id);
-        public Task<IEnumerable<TEntity>> GetManyAsync(Expression<Func<TEntity, bool>>? searchExpression = null, Expression<Func<TEntity, object>>? orderByExpression = null, bool isAscending = true);
-        public Task<IEnumerable<TEntity>> GetPagedAsync(Expression<Func<TEntity, bool>>? searchExpression = null, Expression<Func<TEntity, object>>? orderByExpression = null, bool isAscending = true, int start = 0, int length = 10);
+
+        public Task<TEntity?> GetAsync(
+            Expression<Func<TEntity, bool>>? searchExpression = null,
+            Expression<Func<TEntity, object>>? orderByExpression = null,
+            string[]? includeExpression = null,
+            bool isAscending = true);
+
+        public Task<IEnumerable<TEntity>> GetManyAsync(
+            Expression<Func<TEntity, bool>>? searchExpression = null,
+            Expression<Func<TEntity, object>>? orderByExpression = null,
+            string[]? includeExpression = null,
+            bool isAscending = true);
+
+        public Task<IEnumerable<TEntity>> GetPagedAsync(
+            Expression<Func<TEntity, bool>>? searchExpression = null,
+            Expression<Func<TEntity, object>>? orderByExpression = null,
+            string[]? includeExpression = null,
+            bool isAscending = true,
+            int start = 0,
+            int length = 10);
     }
 }
