@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ToDo.Application.Common.Enums
+namespace ToDo.Application.Abstractions.Identity.Enums
 {
     public enum LoginErrorTypes
     {

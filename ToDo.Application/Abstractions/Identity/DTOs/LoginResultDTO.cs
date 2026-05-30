@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using ToDo.Application.Common.Enums;
+using ToDo.Application.Abstractions.Identity.Enums;
 
 namespace ToDo.Application.Abstractions.Identity.DTOs
 {

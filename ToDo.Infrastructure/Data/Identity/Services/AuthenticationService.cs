@@ -9,10 +9,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
-using ToDo.Application.Common.Enums;
 using ToDo.Infrastructure.Data.Identity.Entities;
 using ToDo.Application.Abstractions.Identity.Services;
 using ToDo.Application.Abstractions.Identity.DTOs;
+using ToDo.Application.Abstractions.Identity.Enums;
 
 namespace ToDo.Infrastructure.Data.Identity.Services
 {

@@ -6,7 +6,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using ToDo.API.Email;
 using ToDo.API.Models.Authentication;
-using ToDo.Application.Common.Enums;
 using ToDo.Application.Abstractions.Email.Services;
 using ToDo.Application.Abstractions.Email.DTOs;
 using ToDo.Application.Abstractions.Identity.Services;

@@ -37,5 +37,74 @@ namespace ToDo.Domain.Entities.Tasks
             CreatedAt = DateTime.UtcNow;
             TaskList = taskList;
         }
+
+        public void Edit(string title, string description, DateTime dueDate)
+        {
+            Title = title;
+            Description = description;
+            DueDate = dueDate;
+        }
+
+        public void MarkAsCompleted()
+        {
+            IsCompleted = true;
+        }
+
+        public void Validate(Action<IDictionary<string, List<string>>> validation)
+        {
+            IDictionary<string, List<string>> errors = new Dictionary<string, List<string>>();
+
+            void AddError(string code, string message)
+            {
+                if (errors.ContainsKey(code))
+                {
+                    errors[code].Add(message);
+                }
+                else
+                {
+                    errors.Add(code, [message]);
+                }
+            }
+
+            // title
+            if (string.IsNullOrWhiteSpace(Title))
+            {
+                AddError("Title", "Title is required");
+            }
+
+            if (Title.Length < 5)
+            {
+                AddError("Title", "Title must be at least 5 characters long");
+            }
+
+            if (Title.Length > 100)
+            {
+                AddError("Title", "Title must be at most 100 characters long");
+            }
+
+            // description
+            if (string.IsNullOrWhiteSpace(this.Description))
+            {
+                AddError("Description", "Description is required");
+            }
+
+            if (Description.Length < 5)
+            {
+                AddError("Description", "Description must be at least 5 characters long");
+            }
+
+            if (Description.Length > 500)
+            {
+                AddError("Description", "Description must be at most 500 characters long");
+            }
+
+            // due date
+            if (DueDate <= DateTime.UtcNow)
+            {
+                AddError("DueDate", "Due date must be in the future");
+            }
+
+            validation(errors);
+        }
     }
 }

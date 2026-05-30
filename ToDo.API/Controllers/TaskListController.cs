@@ -8,7 +8,7 @@ using ToDo.Application.Features.Tasks.DTOs;
 namespace ToDo.API.Controllers
 {
     [Authorize]
-    [Route("api/task-list")]
+    [Route("api/taskLists")]
     [ApiController]
     public class TaskListController : ControllerBase
     {
@@ -40,40 +40,44 @@ namespace ToDo.API.Controllers
             return Created();
         }
 
-        [HttpPut("")]
-        public async Task<IActionResult> UpdateAsync([FromBody] UpdateTaskListModel model)
+        [HttpPut("{taskListId:int}")]
+        public async Task<IActionResult> UpdateAsync([FromRoute] int taskListId, [FromBody] UpdateTaskListModel model)
         {
             var taskList = new UpdateTaskListDTO
             {
-                Id = model.Id,
+                TaskListId = taskListId,
                 Title = model.Title ?? string.Empty,
             };
 
-            var result = await _taskListService.UpdateAsync(taskList);
+            var exists = await _taskListService.ExistsAsync(taskList.TaskListId);
 
-            if (!result)
+            if (!exists)
             {
                 return NotFound();
             }
+
+            await _taskListService.UpdateAsync(taskList);
 
             return Ok();
         }
 
-        [HttpDelete("{id:int}")]
-        public async Task<IActionResult> DeleteAsync([FromRoute] int id)
+        [HttpDelete("{taskListId:int}")]
+        public async Task<IActionResult> DeleteAsync([FromRoute] int taskListId)
         {
-            var result = await _taskListService.DeleteAsync(id);
+            var exists = await _taskListService.ExistsAsync(taskListId);
 
-            if (!result)
+            if (!exists)
             {
                 return NotFound();
             }
 
-            return Ok();
+            await _taskListService.DeleteAsync(taskListId);
+
+            return NoContent();
         }
 
         [HttpGet("")]
-        public async Task<IActionResult> GetAllAsync([FromQuery] int start = 0, [FromQuery] int length = 10)
+        public async Task<IActionResult> GetAllAsync([FromQuery] int start = 0, [FromQuery] int length = 5)
         {
             var user = User.ExtractClaims();
 
@@ -84,10 +88,7 @@ namespace ToDo.API.Controllers
 
             var taskLists = await _taskListService.GetAllAsync(user.Id, start, length);
 
-            return Ok(new
-            {
-                lists = taskLists
-            });
+            return Ok(taskLists);
         }
     }
 }

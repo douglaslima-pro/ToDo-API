@@ -36,5 +36,9 @@ namespace ToDo.Domain.Repositories.Base
             bool isAscending = true,
             int start = 0,
             int length = 10);
+
+        Task LoadAsync(TEntity entity, Expression<Func<TEntity, IEnumerable<object>>> collections);
+
+        Task LoadAsync(TEntity entity, Expression<Func<TEntity, object?>> reference);
     }
 }

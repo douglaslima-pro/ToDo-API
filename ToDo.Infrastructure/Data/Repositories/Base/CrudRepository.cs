@@ -147,6 +147,22 @@ namespace ToDo.Infrastructure.Data.Repositories.Base
                 .ToListAsync();
         }
 
+        public async Task LoadAsync(TEntity entity, Expression<Func<TEntity, IEnumerable<object>>> collection)
+        {
+            await _entity
+                .Entry(entity)
+                .Collection(collection)
+                .LoadAsync();
+        }
+
+        public async Task LoadAsync(TEntity entity, Expression<Func<TEntity, object?>> reference)
+        {
+            await _entity
+                .Entry(entity)
+                .Reference(reference)
+                .LoadAsync();
+        }
+
         // Write
         public void Create(TEntity entity) => _entity.Add(entity);
 

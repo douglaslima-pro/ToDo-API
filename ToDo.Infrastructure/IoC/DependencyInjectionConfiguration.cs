@@ -13,7 +13,6 @@ using ToDo.Application.Abstractions.Email.Services;
 using ToDo.Application.Abstractions.Identity.Services;
 using ToDo.Application.Abstractions.Services;
 using ToDo.Application.Features.Tasks.Services;
-using ToDo.Application.Features.Tasks.Validators;
 using ToDo.Domain.Common.Notification;
 using ToDo.Domain.Repositories;
 using ToDo.Infrastructure.Data.Contexts;
@@ -78,10 +77,6 @@ namespace ToDo.Infrastructure.IoC
                 });
 
             services.AddAuthorization();
-
-            // Validators
-            services.AddScoped<TaskListValidator>();
-            services.AddScoped<TaskListItemValidator>();
 
             // Services
             services.AddScoped<ITaskListService, TaskListService>();

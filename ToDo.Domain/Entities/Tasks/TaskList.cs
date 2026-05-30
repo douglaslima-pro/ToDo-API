@@ -38,6 +38,42 @@ namespace ToDo.Domain.Entities.Tasks
             return task;
         }
 
+        public TaskListItem? EditTask(int taskId, string title, string description, DateTime dueDate)
+        {
+            var task = _tasks.FirstOrDefault(t => t.Id == taskId);
+
+            if (task == null)
+            {
+                return default;
+            }
+
+            task.Edit(title, description, dueDate);
+
+            return task;
+        }
+
+        public void MarkTaskAsCompleted(int taskId, Action<IDictionary<string, List<string>>> validation)
+        {
+            var task = _tasks.FirstOrDefault(t => t.Id == taskId);
+
+            if (task == null)
+            {
+                return;
+            }
+
+            if (task.IsCompleted == true)
+            {
+                validation(new Dictionary<string, List<string>>
+                {
+                    { "Task", new List<string> { "Task is already completed" } }
+                });
+
+                return;
+            }
+
+            task.MarkAsCompleted();
+        }
+
         public void RemoveTask(int taskId)
         {
             var task = _tasks.FirstOrDefault(t => t.Id == taskId);
@@ -51,6 +87,50 @@ namespace ToDo.Domain.Entities.Tasks
         public void Rename(string newTitle)
         {
             Title = newTitle;
+        }
+
+        public TaskListItem? GetTask(int taskId)
+        {
+            return _tasks.FirstOrDefault(t => t.Id == taskId);
+        }
+
+        public bool HasTask(int taskId)
+        {
+            return _tasks.Any(t => t.Id == taskId);
+        }
+
+        public void Validate(Action<IDictionary<string, List<string>>> validation)
+        {
+            IDictionary<string, List<string>> errors = new Dictionary<string, List<string>>();
+
+            void AddError(string code, string message)
+            {
+                if (errors.ContainsKey(code))
+                {
+                    errors[code].Add(message);
+                }
+                else
+                {
+                    errors.Add(code, [message]);
+                }
+            }
+
+            if (string.IsNullOrWhiteSpace(Title))
+            {
+                AddError("Title", "Title is required");
+            }
+
+            if (Title.Length < 5)
+            {
+                AddError("Title", "Title must be at least 5 characters long");
+            }
+
+            if (Title.Length > 100)
+            {
+                AddError("Title", "Title must be at most 100 characters long");
+            }
+
+            validation(errors);
         }
     }
 }

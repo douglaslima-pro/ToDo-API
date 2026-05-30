@@ -11,8 +11,6 @@ namespace ToDo.Domain.Repositories
 {
     public interface ITaskListRepository : ICrudRepository<TaskList, int>
     {
-        Task<TaskListItem?> GetTaskByIdAsync(int id);
-
         Task<IEnumerable<TaskListItem>> GetAllTasksFromListAsync(
             int taskListId,
             Expression<Func<TaskListItem, object?>>? orderByExpression = null,

@@ -16,11 +16,6 @@ namespace ToDo.Infrastructure.Data.Repositories
     {
         public TaskListRepository(ToDoDBContext context) : base(context) { }
 
-        public async Task<TaskListItem?> GetTaskByIdAsync(int id)
-        {
-            return await _context.TaskListItem.FindAsync(id);
-        }
-
         public async Task<IEnumerable<TaskListItem>> GetAllTasksFromListAsync(int taskListId, Expression<Func<TaskListItem, object?>>? orderByExpression = null, bool isAscending = true, int start = 0, int length = 10)
         {
             IQueryable<TaskListItem> query = _context.TaskListItem.AsQueryable();

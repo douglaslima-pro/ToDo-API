@@ -2,7 +2,7 @@
 using System.Reflection;
 using ToDo.Application.Abstractions.Services;
 using ToDo.Application.Features.Tasks.DTOs;
-using ToDo.Application.Features.Tasks.Validators;
+using ToDo.Domain.Common.Notification;
 using ToDo.Domain.Entities.Tasks;
 using ToDo.Domain.Repositories;
 
@@ -13,15 +13,20 @@ namespace ToDo.Application.Features.Tasks.Services
         // repositories
         private readonly ITaskListRepository _taskListRepository;
 
-        // validators
-        private readonly TaskListValidator _taskListValidator;
+        // domain notification
+        private readonly DomainNotification _domainNotification;
 
         public TaskListService(
             ITaskListRepository taskListRepository,
-            TaskListValidator taskListValidator)
+            DomainNotification domainNotification)
         {
             _taskListRepository = taskListRepository;
-            _taskListValidator = taskListValidator;
+            _domainNotification = domainNotification;
+        }
+
+        public async Task<bool> ExistsAsync(int taskListId)
+        {
+            return await _taskListRepository.ExistsAsync(t => t.Id == taskListId);
         }
 
         public async Task<IEnumerable<TaskListDTO>> GetAllAsync(int userId, int start = 0, int length = 5)
@@ -48,7 +53,9 @@ namespace ToDo.Application.Features.Tasks.Services
         {
             var taskList = new TaskList(model.Title, model.UserId);
 
-            if (!_taskListValidator.Validate(taskList))
+            taskList.Validate(e => _domainNotification.AddErrors(e));
+
+            if (_domainNotification.HasErrors())
             {
                 return;
             }
@@ -58,43 +65,41 @@ namespace ToDo.Application.Features.Tasks.Services
             await _taskListRepository.SaveChangesAsync();
         }
 
-        public async Task<bool> UpdateAsync(UpdateTaskListDTO model)
+        public async Task UpdateAsync(UpdateTaskListDTO model)
         {
-            var taskList = await _taskListRepository.GetByIdAsync(model.Id);
+            var taskList = await _taskListRepository.GetByIdAsync(model.TaskListId);
 
             if (taskList == null)
             {
-                return false;
+                return;
             }
 
             taskList.Rename(model.Title);
 
-            if (!_taskListValidator.Validate(taskList))
+            taskList.Validate(e => _domainNotification.AddErrors(e));
+
+            if (_domainNotification.HasErrors())
             {
-                return false;
+                return;
             }
 
             _taskListRepository.Update(taskList);
 
             await _taskListRepository.SaveChangesAsync();
-
-            return true;
         }
 
-        public async Task<bool> DeleteAsync(int id)
+        public async Task DeleteAsync(int taskListId)
         {
-            var taskList = await _taskListRepository.GetByIdAsync(id);
+            var taskList = await _taskListRepository.GetByIdAsync(taskListId);
 
             if (taskList == null)
             {
-                return false;
+                return;
             }
 
             _taskListRepository.Delete(taskList);
 
             await _taskListRepository.SaveChangesAsync();
-
-            return true;
         }
     }
 }
