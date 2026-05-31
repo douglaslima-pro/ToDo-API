@@ -52,7 +52,7 @@ namespace ToDo.API.Controllers
                 TaskId = taskId,
                 Title = model.Title ?? string.Empty,
                 Description = model.Description ?? string.Empty,
-                DueDate = model.DueDate,
+                DueDate = model.DueDate ?? DateTime.UtcNow,
                 TaskListId = taskListId,
             };
 
@@ -77,7 +77,7 @@ namespace ToDo.API.Controllers
             return Ok(tasks);
         }
 
-        [HttpPut("markAsComplete/{taskId:int}")]
+        [HttpPut("markAsCompleted/{taskId:int}")]
         public async Task<IActionResult> MarkAsCompletedAsync([FromRoute] int taskId, [FromRoute] int taskListId)
         {
             await _taskListItemService.MarkAsCompletedAsync(taskId, taskListId);

@@ -20,7 +20,7 @@ namespace ToDo.Infrastructure.Data.Repositories
         {
             IQueryable<TaskListItem> query = _context.TaskListItem.AsQueryable();
 
-            query = query.Where(t => t.Id == taskListId);
+            query = query.Where(t => t.TaskListId == taskListId);
 
             if (orderByExpression != null)
             {

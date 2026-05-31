@@ -15,6 +15,6 @@ namespace ToDo.API.Models.TaskListItem
         public string? Description { get; set; }
         
         [Required(ErrorMessage = "{0} is required")]
-        public DateTime DueDate { get; set; }
+        public DateTime? DueDate { get; set; }
     }
 }

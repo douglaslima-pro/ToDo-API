@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -14,7 +15,7 @@ namespace ToDo.Domain.Common.Notification
         {
             get
             {
-                return (IReadOnlyDictionary<string, IEnumerable<string>>)_errors;
+                return _errors.ToDictionary(kvp => kvp.Key, kvp => (IEnumerable<string>)kvp.Value);
             }
         }
 
