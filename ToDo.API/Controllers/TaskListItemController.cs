@@ -77,7 +77,7 @@ namespace ToDo.API.Controllers
             return Ok(tasks);
         }
 
-        [HttpPut("markAsCompleted/{taskId:int}")]
+        [HttpPut("{taskId:int}/markAsCompleted")]
         public async Task<IActionResult> MarkAsCompletedAsync([FromRoute] int taskId, [FromRoute] int taskListId)
         {
             await _taskListItemService.MarkAsCompletedAsync(taskId, taskListId);
