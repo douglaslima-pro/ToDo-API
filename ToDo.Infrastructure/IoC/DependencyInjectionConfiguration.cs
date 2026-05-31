@@ -9,13 +9,16 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
-using ToDo.Application.Interfaces.Email;
-using ToDo.Application.Interfaces.Identity;
-using ToDo.Application.Interfaces.Services;
-using ToDo.Application.Services;
+using ToDo.Application.Abstractions.Email.Services;
+using ToDo.Application.Abstractions.Identity.Services;
+using ToDo.Application.Abstractions.Services;
+using ToDo.Application.Features.Tasks.Services;
+using ToDo.Domain.Common.Notification;
+using ToDo.Domain.Repositories;
 using ToDo.Infrastructure.Data.Contexts;
 using ToDo.Infrastructure.Data.Identity.Entities;
 using ToDo.Infrastructure.Data.Identity.Services;
+using ToDo.Infrastructure.Data.Repositories;
 using ToDo.Infrastructure.Email.Services;
 
 namespace ToDo.Infrastructure.IoC
@@ -24,6 +27,7 @@ namespace ToDo.Infrastructure.IoC
     {
         public static void AddInfrastructure(this IServiceCollection services, IConfiguration configuration)
         {
+            // database
             services.AddDbContext<ToDoDBContext>(options =>
             {
                 options.UseSqlServer(configuration.GetConnectionString("ToDoConnectionString"));
@@ -47,6 +51,7 @@ namespace ToDo.Infrastructure.IoC
                 .AddClaimsPrincipalFactory<UserClaimsPrincipalFactory<ToDoUser, IdentityRole<int>>>()
                 .AddEntityFrameworkStores<ToDoDBContext>();
 
+            // authentication
             services.AddAuthentication(options =>
             {
                 options.DefaultScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -74,9 +79,20 @@ namespace ToDo.Infrastructure.IoC
             services.AddAuthorization();
 
             // Services
+            services.AddScoped<ITaskListService, TaskListService>();
+            services.AddScoped<ITaskListItemService, TaskListItemService>();
+
+            // Repositories
+            services.AddScoped<ITaskListRepository, TaskListRepository>();
+
+            // Identity
             services.AddScoped<IAuthenticationService, AuthenticationService>();
+
+            // Email
             services.AddScoped<IEmailService, EmailService>();
-            services.AddScoped<ITaskService, TaskService>();
+
+            // Notification
+            services.AddScoped<DomainNotification>();
         }
     }
 }

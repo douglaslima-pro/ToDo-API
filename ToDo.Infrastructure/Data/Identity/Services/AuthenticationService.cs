@@ -9,11 +9,10 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.JsonWebTokens;
 using Microsoft.IdentityModel.Tokens;
-using ToDo.Application.DTOs.Account;
-using ToDo.Application.DTOs.Authentication;
-using ToDo.Application.Enums;
-using ToDo.Application.Interfaces.Identity;
 using ToDo.Infrastructure.Data.Identity.Entities;
+using ToDo.Application.Abstractions.Identity.Services;
+using ToDo.Application.Abstractions.Identity.DTOs;
+using ToDo.Application.Abstractions.Identity.Enums;
 
 namespace ToDo.Infrastructure.Data.Identity.Services
 {
@@ -35,11 +34,11 @@ namespace ToDo.Infrastructure.Data.Identity.Services
         {
             _signInManager = signInManager;
             _userManager = userManager;
-
-                _key = configuration.GetValue<string>("Jwt:Key")!;
-                _audience = configuration.GetValue<string>("Jwt:Audience")!;
-                _issuer = configuration.GetValue<string>("Jwt:Issuer")!;
-                _expiration = configuration.GetValue<int>("Jwt:Expiration");
+            
+            _key = configuration.GetValue<string>("Jwt:Key")!;
+            _audience = configuration.GetValue<string>("Jwt:Audience")!;
+            _issuer = configuration.GetValue<string>("Jwt:Issuer")!;
+            _expiration = configuration.GetValue<int>("Jwt:Expiration");
         }
 
         public async Task<RegisterResultDTO> RegisterAsync(RegisterRequestDTO registerRequest)
@@ -139,7 +138,6 @@ namespace ToDo.Infrastructure.Data.Identity.Services
             {
                 new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()),
                 new Claim(ClaimTypes.Name, user.FirstName ?? string.Empty),
-                new Claim(Microsoft.IdentityModel.JsonWebTokens.JwtRegisteredClaimNames.Sub, user.UserName ?? string.Empty),
                 new Claim(ClaimTypes.Email, user.Email ?? string.Empty),
             };
 

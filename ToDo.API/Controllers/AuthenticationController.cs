@@ -6,10 +6,10 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using ToDo.API.Email;
 using ToDo.API.Models.Authentication;
-using ToDo.Application.DTOs.Authentication;
-using ToDo.Application.Enums;
-using ToDo.Application.Interfaces.Email;
-using ToDo.Application.Interfaces.Identity;
+using ToDo.Application.Abstractions.Email.Services;
+using ToDo.Application.Abstractions.Email.DTOs;
+using ToDo.Application.Abstractions.Identity.Services;
+using ToDo.Application.Abstractions.Identity.DTOs;
 
 namespace ToDo.API.Controllers
 {
@@ -67,11 +67,6 @@ namespace ToDo.API.Controllers
         [HttpPost("[action]")]
         public async Task<IActionResult> LoginAsync([FromBody] LoginRequestModel body)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
             var loginRequest = new LoginRequestDTO
             {
                 Email = body.Email ?? string.Empty,
@@ -96,11 +91,6 @@ namespace ToDo.API.Controllers
         [HttpPost("email-confirmation/send")]
         public async Task<IActionResult> SendEmailConfirmationTokenAsync([FromBody] SendEmailConfirmationTokenModel model)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
             var exists = await _authenticationService.ExistsByEmailAsync(model.Email!);
 
             if (!exists)
@@ -124,7 +114,14 @@ namespace ToDo.API.Controllers
 
             var emailTemplate = await _emailTemplateReader.ReadTemplateAsync("EmailConfirmationTemplate", emailTemplateValues);
 
-            await _emailService.SendAsync(model.Email!, "E-mail confirmation", emailTemplate);
+            var emailMessage = new EmailMessageDTO
+            {
+                To = model.Email!,
+                Subject = "E-mail confirmation",
+                Body = emailTemplate
+            };
+
+            await _emailService.SendAsync(emailMessage);
 
             return Ok();
         }
@@ -132,11 +129,6 @@ namespace ToDo.API.Controllers
         [HttpPost("email-confirmation/verify", Name = "ConfirmEmail")]
         public async Task<IActionResult> VerifyEmailConfirmationTokenAsync([FromBody] VerifyEmailConfirmationTokenModel model)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
             var confirmEmailRequest = new ConfirmEmailRequestDTO
             {
                 Email = model.Email ?? string.Empty,
@@ -151,11 +143,6 @@ namespace ToDo.API.Controllers
         [HttpPost("password-reset/send")]
         public async Task<IActionResult> SendPasswordResetTokenAsync([FromBody] SendPasswordResetTokenModel model)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
             var exists = await _authenticationService.ExistsByEmailAsync(model.Email!);
 
             if (!exists)
@@ -177,7 +164,14 @@ namespace ToDo.API.Controllers
                 { "link", link }
             });
 
-            await _emailService.SendAsync(model.Email!, "Reset password", emailTemplate);
+            var emailMessage = new EmailMessageDTO
+            {
+                To = model.Email!,
+                Subject = "Reset password",
+                Body = emailTemplate
+            };
+
+            await _emailService.SendAsync(emailMessage);
 
             return Ok();
         }
@@ -185,11 +179,6 @@ namespace ToDo.API.Controllers
         [HttpPost("password-reset/verify", Name = "ResetPassword")]
         public async Task<IActionResult> VerifyPasswordResetTokenAsync([FromBody] VerifyPasswordResetTokenModel model)
         {
-            if (!ModelState.IsValid)
-            {
-                return BadRequest(ModelState);
-            }
-
             var resetPasswordRequest = new ResetPasswordRequestDTO
             {
                 Email = model.Email ?? string.Empty,
